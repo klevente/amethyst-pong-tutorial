@@ -14,5 +14,16 @@ impl SimpleState for Pong {}
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
+
+    let app_root = application_root_dir()?;
+    let display_config_path = app_root.join("config").join("display.ron");
+
+    // stores the game logic, by the way of `System`s and `Bundle`s
+    let game_data = GameDataBuilder::default();
+
+    let assets_dir = app_root.join("assets");
+
+    let mut game = Application::new(assets_dir, Pong, game_data)?;
+    game.run();
     Ok(())
 }
