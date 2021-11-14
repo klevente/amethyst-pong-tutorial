@@ -18,8 +18,18 @@ fn main() -> amethyst::Result<()> {
     let app_root = application_root_dir()?;
     let display_config_path = app_root.join("config").join("display.ron");
 
-    // stores the game logic, by the way of `System`s and `Bundle`s
-    let game_data = GameDataBuilder::default();
+    // stores the game setup by the way of `System`s and bundles,
+    // which are essentially collection of `System`s providing certain features to the engine
+    let game_data = GameDataBuilder::default().with_bundle(
+        RenderingBundle::<DefaultBackend>::new()
+            // provides scaffolding for creating a window and drawing to it
+            .with_plugin(
+                RenderToWindow::from_config_path(display_config_path)?
+                    .with_clear([0.00196, 0.23726, 0.21765, 1.0]),
+            )
+            // plugin used to render entities with a `SpriteRender` component
+            .with_plugin(RenderFlat2D::default()),
+    )?;
 
     let assets_dir = app_root.join("assets");
 
