@@ -21,7 +21,8 @@ impl SimpleState for Pong {
         let sprite_sheet_handle = load_sprite_sheet(world);
 
         // components not used in any `System`s need to be manually registered in the `world`
-        world.register::<Paddle>();
+        // as `Paddle` is used in `PaddleSystem`, this is no longer necessary
+        // world.register::<Paddle>();
 
         initialise_paddles(world, sprite_sheet_handle);
         initialise_camera(world);
