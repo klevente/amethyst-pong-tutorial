@@ -1,5 +1,6 @@
 use amethyst::{
     core::transform::TransformBundle,
+    input::{InputBundle, StringBindings},
     prelude::*,
     renderer::{
         plugins::{RenderFlat2D, RenderToWindow},
@@ -19,9 +20,16 @@ fn main() -> amethyst::Result<()> {
     let app_root = application_root_dir()?;
     let display_config_path = app_root.join("config").join("display.ron");
 
+    let binding_path = app_root.join("config").join("bindings.ron");
+    let input_bundle =
+        InputBundle::<StringBindings>::new().with_bindings_from_file(binding_path)?;
+
     // stores the game setup by the way of `System`s and bundles,
     // which are essentially collection of `System`s providing certain features to the engine
     let game_data = GameDataBuilder::default()
+        // `TransformBundle` handles the tracking of entity positions
+        .with_bundle(TransformBundle::new())?
+        .with_bundle(input_bundle)?
         .with_bundle(
             RenderingBundle::<DefaultBackend>::new()
                 // provides scaffolding for creating a window and drawing to it
@@ -31,9 +39,7 @@ fn main() -> amethyst::Result<()> {
                 )
                 // plugin used to render entities with a `SpriteRender` component
                 .with_plugin(RenderFlat2D::default()),
-        )?
-        // `TransformBundle` handles the tracking of entity positions
-        .with_bundle(TransformBundle::new())?;
+        )?;
 
     let assets_dir = app_root.join("assets");
 
