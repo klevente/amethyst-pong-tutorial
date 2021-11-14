@@ -11,6 +11,7 @@ use amethyst::{
 };
 
 mod pong;
+mod systems;
 
 use crate::pong::Pong;
 
@@ -30,6 +31,8 @@ fn main() -> amethyst::Result<()> {
         // `TransformBundle` handles the tracking of entity positions
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
+        // provide an instance of the `System`, a string name and a list of dependencies
+        .with(systems::PaddleSystem, "paddle_system", &["input_system"])
         .with_bundle(
             RenderingBundle::<DefaultBackend>::new()
                 // provides scaffolding for creating a window and drawing to it
