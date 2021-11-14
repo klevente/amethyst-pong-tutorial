@@ -8,9 +8,9 @@ use amethyst::{
     utils::application_root_dir,
 };
 
-pub struct Pong;
+mod pong;
 
-impl SimpleState for Pong {}
+use crate::pong::Pong;
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
