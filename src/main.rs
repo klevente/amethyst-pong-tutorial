@@ -48,7 +48,8 @@ fn main() -> amethyst::Result<()> {
             systems::BounceSystem,
             "collision_system",
             &["paddle_system", "ball_system"],
-        );
+        )
+        .with(systems::WinnerSystem, "winner_system", &["ball_system"]);
 
     let assets_dir = app_root.join("assets");
 
