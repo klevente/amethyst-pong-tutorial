@@ -37,7 +37,7 @@ fn main() -> amethyst::Result<()> {
                 // provides scaffolding for creating a window and drawing to it
                 .with_plugin(
                     RenderToWindow::from_config_path(display_config_path)?
-                        .with_clear([0.00196, 0.23726, 0.21765, 1.0]),
+                        .with_clear([0.0, 0.0, 0.0, 1.0]),
                 )
                 // plugin used to render entities with a `SpriteRender` component
                 .with_plugin(RenderFlat2D::default())
