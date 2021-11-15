@@ -262,6 +262,6 @@ fn initialise_scoreboard(world: &mut World) {
         ))
         .build();
 
-    // add this as a `Resource` to the `world`, so it can be accessed by other functions
+    // add this as a `Resource` to the `world`, so it can be accessed by other functions/systems
     world.insert(ScoreText { p1_score, p2_score });
 }
