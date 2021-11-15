@@ -1,3 +1,4 @@
+use amethyst::core::Time;
 use amethyst::{
     assets::{AssetStorage, Handle, Loader},
     core::transform::Transform,
@@ -16,24 +17,50 @@ pub const BALL_VELOCITY_X: f32 = 75.0;
 pub const BALL_VELOCITY_Y: f32 = 50.0;
 pub const BALL_RADIUS: f32 = 2.0;
 
-pub struct Pong;
+#[derive(Default)]
+pub struct Pong {
+    // counts down to `Some(0)` then gets replaced with `None`
+    ball_spawn_timer: Option<f32>,
+    // only populated in `on_start`
+    sprite_sheet_handle: Option<Handle<SpriteSheet>>,
+}
 
 impl SimpleState for Pong {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
 
+        // wait one second before spawning the ball
+        self.ball_spawn_timer.replace(1.0);
+
         // `Clone`able reference to the `SpriteSheet`
-        let sprite_sheet_handle = load_sprite_sheet(world);
+        self.sprite_sheet_handle.replace(load_sprite_sheet(world));
 
         // components not used in any `System`s need to be manually registered in the `world`
         // as `Paddle` is used in `PaddleSystem`, this is no longer necessary
         // world.register::<Paddle>();
-        world.register::<Ball>();
 
         // `clone` is required as the function consumes this handle
-        initialise_ball(world, sprite_sheet_handle.clone());
-        initialise_paddles(world, sprite_sheet_handle);
+        initialise_paddles(world, self.sprite_sheet_handle.clone().unwrap());
         initialise_camera(world);
+    }
+
+    fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
+        if let Some(mut timer) = self.ball_spawn_timer.take() {
+            // if timer has not expired, subtract elapsed time (`take` consumes the `Option`, leaving `None`)
+            {
+                let time = data.world.fetch::<Time>();
+                timer -= time.delta_seconds();
+            }
+
+            if timer <= 0.0 {
+                // if the timer expired, spawn the ball in
+                initialise_ball(data.world, self.sprite_sheet_handle.clone().unwrap());
+            } else {
+                // if the timer has not expired, put its current value back in the state
+                self.ball_spawn_timer.replace(timer);
+            }
+        }
+        Trans::None
     }
 }
 
