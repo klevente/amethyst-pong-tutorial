@@ -1,4 +1,3 @@
-use crate::audio::Music;
 use amethyst::{
     audio::{AudioBundle, DjSystemDesc},
     core::transform::TransformBundle,
@@ -17,7 +16,7 @@ mod audio;
 mod pong;
 mod systems;
 
-use crate::pong::Pong;
+use crate::{audio::Music, pong::Pong};
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
