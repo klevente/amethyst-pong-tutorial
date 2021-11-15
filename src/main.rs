@@ -7,6 +7,7 @@ use amethyst::{
         types::DefaultBackend,
         RenderingBundle,
     },
+    ui::{RenderUi, UiBundle},
     utils::application_root_dir,
 };
 
@@ -39,8 +40,11 @@ fn main() -> amethyst::Result<()> {
                         .with_clear([0.00196, 0.23726, 0.21765, 1.0]),
                 )
                 // plugin used to render entities with a `SpriteRender` component
-                .with_plugin(RenderFlat2D::default()),
+                .with_plugin(RenderFlat2D::default())
+                .with_plugin(RenderUi::default()),
         )?
+        // needs to come after `InputBundle`
+        .with_bundle(UiBundle::<StringBindings>::new())?
         // provide an instance of the `System`, a string name and a list of dependencies
         .with(systems::PaddleSystem, "paddle_system", &["input_system"])
         .with(systems::MoveBallsSystem, "ball_system", &[])
