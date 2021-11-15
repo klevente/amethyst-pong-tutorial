@@ -12,18 +12,26 @@ pub const ARENA_HEIGHT: f32 = 100.0;
 pub const PADDLE_WIDTH: f32 = 4.0;
 pub const PADDLE_HEIGHT: f32 = 16.0;
 
+pub const BALL_VELOCITY_X: f32 = 75.0;
+pub const BALL_VELOCITY_Y: f32 = 50.0;
+pub const BALL_RADIUS: f32 = 2.0;
+
 pub struct Pong;
 
 impl SimpleState for Pong {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
 
+        // `Clone`able reference to the `SpriteSheet`
         let sprite_sheet_handle = load_sprite_sheet(world);
 
         // components not used in any `System`s need to be manually registered in the `world`
         // as `Paddle` is used in `PaddleSystem`, this is no longer necessary
         // world.register::<Paddle>();
+        world.register::<Ball>();
 
+        // `clone` is required as the function consumes this handle
+        initialise_ball(world, sprite_sheet_handle.clone());
         initialise_paddles(world, sprite_sheet_handle);
         initialise_camera(world);
     }
@@ -126,5 +134,33 @@ fn initialise_paddles(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet
         .with(sprite_render)
         .with(Paddle::new(Side::Right))
         .with(right_transform)
+        .build();
+}
+
+pub struct Ball {
+    pub velocity: [f32; 2],
+    pub radius: f32,
+}
+
+impl Component for Ball {
+    type Storage = DenseVecStorage<Self>;
+}
+
+// initialises one ball in the middle of the screen
+fn initialise_ball(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
+    let mut transform = Transform::default();
+    transform.set_translation_xyz(ARENA_WIDTH * 0.5, ARENA_HEIGHT * 0.5, 0.0);
+
+    // the ball is the second sprite in the sheet
+    let sprite_render = SpriteRender::new(sprite_sheet_handle, 1);
+
+    world
+        .create_entity()
+        .with(sprite_render)
+        .with(Ball {
+            radius: BALL_RADIUS,
+            velocity: [BALL_VELOCITY_X, BALL_VELOCITY_Y],
+        })
+        .with(transform)
         .build();
 }
